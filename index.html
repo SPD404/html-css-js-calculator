@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Calculator</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1d2671, #c33764);
+    margin: 0;
+  }
+
+  #calculator {
+    width: 100%;
+    max-width: 320px;
+    background: #222;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  #display {
+    width: 100%;
+    height: 60px;
+    font-size: 28px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: right;
+  }
+
+  #buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  button {
+    height: 55px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+  }
+
+  button.operator {
+    background: #ff9500;
+  }
+
+  button.equal {
+    background: #28a745;
+    grid-column: span 2;
+  }
+
+  button.clear {
+    background: #dc3545;
+    grid-column: span 2;
+  }
+
+  button:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: 400px) {
+    #calculator {
+      max-width: 95%;
+    }
+  }
+  .creator {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.creator span {
+  color: #ff9500;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="calculator">
+  <input id="display" readonly>
+  <div class="creator">Created by <span>Saiprasad</span></div>
+
+
+  <div id="buttons">
+    <button class="clear">C</button>
+    <button class="operator">/</button>
+    <button class="operator">*</button>
+
+    <button>7</button><button>8</button><button>9</button>
+    <button class="operator">-</button>
+
+    <button>4</button><button>5</button><button>6</button>
+    <button class="operator">+</button>
+
+    <button>1</button><button>2</button><button>3</button>
+    <button class="equal">=</button>
+
+    <button>0</button>
+    <button>.</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById("display");
+  let current = "";
+  let operator = "";
+  let previous = "";
+
+  function updateDisplay() {
+    display.value = current || previous || "0";
+  }
+
+  function calculate() {
+    let a = parseFloat(previous);
+    let b = parseFloat(current);
+    let result = 0;
+
+    if (operator === "+") result = a + b;
+    if (operator === "-") result = a - b;
+    if (operator === "*") result = a * b;
+    if (operator === "/") result = b === 0 ? "Error" : a / b;
+
+    current = result.toString();
+    operator = "";
+    previous = "";
+  }
+
+  document.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => handleInput(btn.textContent));
+  });
+
+  function handleInput(value) {
+    if (!isNaN(value) || value === ".") {
+      current += value;
+    }
+    else if ("+-*/".includes(value)) {
+      if (current === "") return;
+      previous = current;
+      current = "";
+      operator = value;
+    }
+    else if (value === "=") {
+      if (previous && current) calculate();
+    }
+    else if (value === "C") {
+      current = "";
+      previous = "";
+      operator = "";
+    }
+    updateDisplay();
+  }
+
+  // ⌨️ Keyboard Support
+  document.addEventListener("keydown", e => {
+    if ((e.key >= 0 && e.key <= 9) || e.key === ".") handleInput(e.key);
+    if ("+-*/".includes(e.key)) handleInput(e.key);
+    if (e.key === "Enter") handleInput("=");
+    if (e.key === "Backspace") {
+      current = current.slice(0, -1);
+      updateDisplay();
+    }
+    if (e.key === "Escape") handleInput("C");
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
